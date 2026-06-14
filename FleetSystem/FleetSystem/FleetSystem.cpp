@@ -166,5 +166,37 @@ public:
 };
 
 int main() {
+    cout << "--- Starting Simulation ---" << endl;
+
+    Fleet myFleet;
+
+    myFleet.addShip(make_unique<Spacecraft>());
+    myFleet.addShip(make_unique<Spacecraft>());
+
+    try {
+        cout << "Creating a temporary ship..." << endl;
+        unique_ptr<Spacecraft> temporaryShip = make_unique<Spacecraft>();
+
+        cout << "Creating a plasma engine..." << endl;
+        unique_ptr<Engine> plasmaEngine = make_unique<Engine>("Plasma", 100);
+
+        temporaryShip->mountModule(plasmaEngine.get());
+
+        Maneuver basicManeuver;
+        temporaryShip->executeManeuver(basicManeuver);
+
+        temporaryShip->tick();
+
+        cout << "Trying to dock the ship..." << endl;
+        temporaryShip->dock();
+
+    }
+    catch (const DockingException& error) {
+        cout << "An error happened: " << error.what() << endl;
+    }
+
+    myFleet.destroyOneShip();
+
+    cout << "--- End of Simulation ---" << endl;
     return 0;
 }
