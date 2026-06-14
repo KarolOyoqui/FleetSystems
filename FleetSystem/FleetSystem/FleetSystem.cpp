@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <memory>
 
 using namespace std;
 
@@ -8,20 +9,20 @@ class Maneuver {};
 
 class FuelTank {
 public:
-    FuelTank() { cout << "FuelTank creado\n"; }
-    ~FuelTank() { cout << "FuelTank destruido\n"; }
+    FuelTank() { cout << "FuelTank created\n"; }
+    ~FuelTank() { cout << "FuelTank destroyed\n"; }
 };
 
 class Telemetry {
 public:
-    Telemetry() { cout << "Telemetry creado\n"; }
-    ~Telemetry() { cout << "Telemetry destruido\n"; }
+    Telemetry() { cout << "Telemetry created\n"; }
+    ~Telemetry() { cout << "Telemetry destroyed\n"; }
 };
 
 class Entity {
 public:
-    Entity() { cout << "Entity creado\n"; }
-    virtual ~Entity() { cout << "Entity destruido\n"; }
+    Entity() { cout << "Entity created\n"; }
+    virtual ~Entity() { cout << "Entity destroyed\n"; }
 };
 
 class Module {
@@ -29,23 +30,23 @@ protected:
     string name;
     int power;
 public:
-    Module(string n, int p) : name(n), power(p) { cout << "Module creado\n"; }
-    virtual ~Module() { cout << "Module destruido\n"; }
-    virtual void activate() { cout << "Modulo activado\n"; }
+    Module(string n, int p) : name(n), power(p) { cout << "Module created\n"; }
+    virtual ~Module() { cout << "Module destroyed\n"; }
+    virtual void activate() { cout << "Module activated\n"; }
 };
 
 class Engine final : public Module {
 public:
-    Engine(string n, int p) : Module(n, p) { cout << "Engine creado\n"; }
-    ~Engine() override { cout << "Engine destruido\n"; }
-    void activate() override { cout << "Motor " << name << " encendido!\n"; }
+    Engine(string n, int p) : Module(n, p) { cout << "Engine created\n"; }
+    ~Engine() override { cout << "Engine destroyed\n"; }
+    void activate() override { cout << "Engine " << name << " turned on!\n"; }
 };
 
 class Shield final : public Module {
 public:
-    Shield(string n, int p) : Module(n, p) { cout << "Shield creado\n"; }
-    ~Shield() override { cout << "Shield destruido\n"; }
-    void activate() override { cout << "Escudo " << name << " encendido!\n"; }
+    Shield(string n, int p) : Module(n, p) { cout << "Shield created\n"; }
+    ~Shield() override { cout << "Shield destroyed\n"; }
+    void activate() override { cout << "Shield " << name << " turned on!\n"; }
 };
 
 class Spacecraft : public Entity {
@@ -55,8 +56,8 @@ private:
     Module* module;
 
 public:
-    Spacecraft() : Entity(), module(nullptr) { cout << "Spacecraft creado\n"; }
-    ~Spacecraft() override { cout << "Spacecraft destruido\n"; }
+    Spacecraft() : Entity(), module(nullptr) { cout << "Spacecraft created\n"; }
+    ~Spacecraft() override { cout << "Spacecraft destroyed\n"; }
 
     void mountModule(Module* m) { module = m; }
     void executeManeuver(const Maneuver& m) {}
@@ -65,6 +66,8 @@ public:
         if (module) module->activate();
     }
 };
+
+// Rule of 5
 class CargoHold {
 private:
     int* cargo;
@@ -115,6 +118,29 @@ public:
         other.cargo = nullptr;
         other.size = 0;
         return *this;
+    }
+};
+
+// Rule of zero
+class ModernCargoHold {
+private:
+    std::vector<int> cargo_;
+
+public:
+    ModernCargoHold() = default;
+
+    void addCargo(const int& p) { cargo_.push_back(p); }
+    int getSize() const { return static_cast<int>(cargo_.size()); }
+    const int& getCargo(int i) const { return cargo_.at(i); }
+};
+
+class Fleet {
+private:
+    std::vector<std::unique_ptr<Spacecraft>> ships_;
+
+public:
+    void addShip(std::unique_ptr<Spacecraft> ship) {
+        ships_.push_back(std::move(ship));
     }
 };
 
