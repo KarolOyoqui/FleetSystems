@@ -144,6 +144,13 @@ public:
     }
 };
 
+// Exception Safety and RAII
+class DockingException : public std::runtime_error {
+public:
+    DockingException(const string& msg) : std::runtime_error(msg) {}
+};
+
+
 int main() {
     return 0;
 }
