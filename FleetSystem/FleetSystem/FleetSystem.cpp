@@ -2,15 +2,24 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <stdexcept>
 
 using namespace std;
 
 class Maneuver {};
 
-class FuelTank {
+class DockingException : public std::runtime_error {
 public:
-    FuelTank() { cout << "FuelTank created\n"; }
+    DockingException(const string& msg) : std::runtime_error(msg) {}
+};
+
+class FuelTank {
+private:
+    int fuelLevel;
+public:
+    FuelTank() : fuelLevel(0) { cout << "FuelTank created\n"; }
     ~FuelTank() { cout << "FuelTank destroyed\n"; }
+    int getFuel() const { return fuelLevel; }
 };
 
 class Telemetry {
@@ -65,9 +74,15 @@ public:
     void tick() {
         if (module) module->activate();
     }
+
+    void dock() {
+        if (tank.getFuel() < 10) {
+            throw DockingException("Docking failed: Insufficient fuel!");
+        }
+        cout << "Docking successful!\n";
+    }
 };
 
-// Rule of 5
 class CargoHold {
 private:
     int* cargo;
@@ -121,7 +136,6 @@ public:
     }
 };
 
-// Rule of zero
 class ModernCargoHold {
 private:
     std::vector<int> cargo_;
@@ -142,14 +156,14 @@ public:
     void addShip(std::unique_ptr<Spacecraft> ship) {
         ships_.push_back(std::move(ship));
     }
-};
 
-// Exception Safety and RAII
-class DockingException : public std::runtime_error {
-public:
-    DockingException(const string& msg) : std::runtime_error(msg) {}
+    void destroyOneShip() {
+        if (!ships_.empty()) {
+            cout << "\nDestroying one ship from Fleet\n";
+            ships_.pop_back();
+        }
+    }
 };
-
 
 int main() {
     return 0;
